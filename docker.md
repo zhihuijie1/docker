@@ -1,5 +1,9 @@
 
 
+[TOC]
+
+
+
 # **wsl重启**
 
 ```shell
@@ -392,29 +396,619 @@ docker在运行时，只需要提供一个最基本的文件系统rootfs，这�
 
 ![image.png](https://img-blog.csdnimg.cn/img_convert/435273e507db3adeddf3c705f8271708.png#averageHue=#4ea6bd&clientId=u47714028-2a0a-4&from=paste&height=279&id=u7476b4c8&originHeight=469&originWidth=557&originalType=binary&ratio=1&rotation=0&showTitle=false&size=247980&status=done&style=none&taskId=ud998639d-0f62-49bf-9dc8-677d7801a60&title=&width=331)
 
-#### Docker 镜像 commit 操作案例
+### 6：Docker 镜像 commit 操作案例
 
+```
 docker commit -m=“提交的描述信息” -a=“作者” 容器ID 要创建的目标镜像名:[标签名]
+```
 
 以 Ubuntu 举例，在 Ubuntu 增加 vim 命令。
 
 ```shell
-# 容器内更新包管理工具
-apt-get update
-# 安装 vim
-apt-get -y install vim
-
-# 完成后，commit新镜像
-docker commit -m"add vim cmd" -a"username" 容器id atguigu/myubuntu:1.1
-
-# 启动新的镜像
-docker run -it imageId
-
+#[terrychen@terrychen ~]$ sudo docker ps
+CONTAINER ID   IMAGE          COMMAND                   CREATED        STATUS              PORTS      NAMES
+795c161779ba   redis:6.2      "docker-entrypoint.s…"   26 hours ago   Up 26 hours         6379/tcp   redis-1
+b73dacfdde8a   ubuntu:20.04   "bash"                    31 hours ago   Up About a minute              ubuntu-1
+#[terrychen@terrychen ~]$ sudo docker exec -it b73dacfdde8a /bin/bash
+#root@b73dacfdde8a:/# vim a.txt
+bash: vim: command not found
+#root@b73dacfdde8a:/# apt-get update
+#root@b73dacfdde8a:/# apt-get -y install vim
+#[terrychen@terrychen ~]$ sudo docker commit -m 'add vim' -a'vimAddUbuntu' b73dacfdde8a vimaddubuntu
+#[terrychen@terrychen ~]$ sudo docker images
+REPOSITORY     TAG       IMAGE ID       CREATED          SIZE
+vimaddubuntu   latest    b40d6198c5f5   33 seconds ago   192MB
+ubuntu         20.04     2abc4dfd8318   10 days ago      72.8MB
+redis          6.2       7734eda5fdc1   4 weeks ago      106MB
+#[terrychen@terrychen ~]$ sudo docker ps
+CONTAINER ID   IMAGE          COMMAND                   CREATED        STATUS          PORTS      NAMES
+795c161779ba   redis:6.2      "docker-entrypoint.s…"   27 hours ago   Up 27 hours     6379/tcp   redis-1
+b73dacfdde8a   ubuntu:20.04   "bash"                    32 hours ago   Up 41 minutes              ubuntu-1
 ```
 
-### 本地镜像发布到阿里云
+```
+docker commit 命令的主要的功能是：容器要在当前镜像的基础上，可能要加一些东西，可能要配置一些东西，此时这个容器就是我以后想要用的模板，我用docker commit  将我的这个容器直接变成一个模板
+```
+
+```
+这个地方也是docker镜像的分层,在原镜像的基础上，进行增强之后的镜像叠在原镜像的上面
+```
+
+
+
+### 7：本地镜像发布到阿里云
 
 ![image.png](https://img-blog.csdnimg.cn/img_convert/304fe0eefc1ca42cdad206c78bc4baf2.png#averageHue=#f3f3f3&clientId=u47714028-2a0a-4&from=paste&height=601&id=u116f3204&originHeight=601&originWidth=677&originalType=binary&ratio=1&rotation=0&showTitle=false&size=118430&status=done&style=none&taskId=uf7f5f212-59b0-44d1-b327-375b14c1962&title=&width=677)
+
+阿里云开发者平台配置
+
+https://promotion.aliyun.com/ntms/act/kubernetes.html
+
+登录后，点击镜像搜索
+
+创建仓库镜像
+
+![image.png](https://img-blog.csdnimg.cn/img_convert/92ed9b2c20ee056669d4d5b4baa8f1a4.png#averageHue=#dbd8d3&clientId=u47714028-2a0a-4&from=paste&height=440&id=u1c20a63d&originHeight=440&originWidth=891&originalType=binary&ratio=1&rotation=0&showTitle=false&size=130357&status=done&style=none&taskId=u4ad58600-dcf4-4b91-a75a-33100f8a3e8&title=&width=891)
+
+选择控制台->云服务器ECS->容器镜像服务
+
+选择个人实例
+
+![image.png](https://img-blog.csdnimg.cn/img_convert/3dd0a1ab215bd6c52e524a08c70aa478.png#averageHue=#faf7f4&clientId=u47714028-2a0a-4&from=paste&height=377&id=uce44ad54&originHeight=377&originWidth=879&originalType=binary&ratio=1&rotation=0&showTitle=false&size=105654&status=done&style=none&taskId=u2526902b-03e4-4c3b-978e-0d3e27ed606&title=&width=879)
+
+命令空间
+
+![image.png](https://img-blog.csdnimg.cn/img_convert/abc4b6797bcb1c900b1c94bd7bb80f1a.png#averageHue=#fdfbfa&clientId=u47714028-2a0a-4&from=paste&height=429&id=u1788aa6d&originHeight=429&originWidth=857&originalType=binary&ratio=1&rotation=0&showTitle=false&size=81424&status=done&style=none&taskId=ucc2191fb-ca8e-4843-b469-664706073d0&title=&width=857)
+
+创建命令空间
+
+仓库名称
+
+![image.png](https://img-blog.csdnimg.cn/img_convert/11b7c841cd939b082b86035362fbbc25.png#averageHue=#fdfbfa&clientId=u47714028-2a0a-4&from=paste&height=430&id=ue1c4bfd5&originHeight=430&originWidth=868&originalType=binary&ratio=1&rotation=0&showTitle=false&size=76664&status=done&style=none&taskId=u414b6278-c04f-4970-b909-57c5d718c1f&title=&width=868)
+
+![image.png](https://img-blog.csdnimg.cn/img_convert/9e75de62c674a6bf02adabe14cc79f90.png#averageHue=#dbd8d8&clientId=u47714028-2a0a-4&from=paste&height=383&id=ud2add7f6&originHeight=383&originWidth=863&originalType=binary&ratio=1&rotation=0&showTitle=false&size=83118&status=done&style=none&taskId=u8ee40939-aa81-4ebe-8867-e2d83e7b6b1&title=&width=863)
+
+![image.png](https://img-blog.csdnimg.cn/img_convert/21ca218632330020ac1949bd2488fe1e.png#averageHue=#c4c3c3&clientId=u47714028-2a0a-4&from=paste&height=411&id=u1cf7ec5b&originHeight=411&originWidth=858&originalType=binary&ratio=1&rotation=0&showTitle=false&size=76071&status=done&style=none&taskId=ucd91e69a-4d8a-4b1e-9579-360eb3f7bbc&title=&width=858)
+
+进入管理界面获得脚本
+
+![image.png](https://img-blog.csdnimg.cn/img_convert/b7206f6065552732be0f9f6d27237782.png#averageHue=#fcfbfa&clientId=u47714028-2a0a-4&from=paste&height=266&id=u826d66e0&originHeight=266&originWidth=882&originalType=binary&ratio=1&rotation=0&showTitle=false&size=58914&status=done&style=none&taskId=u30a76477-b4f0-48c5-8ba4-0c6f3c4b8c0&title=&width=882)
+
+将镜像推送到阿里云
+
+![image.png](https://img-blog.csdnimg.cn/img_convert/c507404ed305bc6c56f0426e83f177ca.png#averageHue=#dcb998&clientId=u47714028-2a0a-4&from=paste&height=600&id=u8a09039a&originHeight=600&originWidth=858&originalType=binary&ratio=1&rotation=0&showTitle=false&size=169848&status=done&style=none&taskId=u0efbd58b-7979-4587-85a6-228ce67d850&title=&width=858)
+
+将阿里云上的镜像下载到本地
+docker pull registry.cn-hangzhou.aliyuncs.com/atguiguwh/myubuntu:1.1
+
+![image.png](https://img-blog.csdnimg.cn/img_convert/0e474376bd0408bb38f1f4eabb978883.png#averageHue=#fdfbfb&clientId=u47714028-2a0a-4&from=paste&height=283&id=uee3c0f38&originHeight=283&originWidth=727&originalType=binary&ratio=1&rotation=0&showTitle=false&size=152514&status=done&style=none&taskId=u6c318159-834e-429f-9458-ce16c4c7b23&title=&width=727)
+
+
+
+
+
+### 8：本地镜像发布到私有库
+
+ Dockerhub、阿里云这样的公共镜像仓库可能不太方便，涉及机密的公司不可能提供镜像给公网，所以需要创建一个本地私人仓库供给团队使用，基于公司内部项目构建镜像。
+
+Docker Registry是官方提供的工具，可以用于构建私有镜像仓库
+
+将本地镜像推送到私有库流程：
+
+**1.下载镜像Docker Registry**
+
+```
+docker pull registry
+```
+
+
+**2.运行私有库Registry，相当于本地有个私有Docker hub**
+
+```
+docker run -d -p 5000:5000 -v /zzyyuse/myregistry/:/tmp/registry --privileged=true registry
+```
+
+
+默认情况，仓库被创建在容器的/var/lib/registry目录下，建议自行用容器卷映射，方便于宿主机联调
+
+
+
+**3.案例演示创建一个新镜像，ubuntu安装ifconfig命令**
+
+ 3.1 从Hub上下载ubuntu镜像到本地并成功运行
+
+ 3.2 原始的Ubuntu镜像是不带着ifconfig命令的
+
+ 3.3 外网连通的情况下，安装ifconfig命令并测试通过
+
+```
+apt-get update
+apt-get install net-tools
+```
+
+ 3.4 安装完成后，commit我们自己的新镜像
+
+```
+docker commit -m="ifconfig cmd add" -a="z" be4779f8w112 zubuntu:1.2
+```
+
+
+ 3.5 启动我们的新镜像并和原来的对比
+
+**4.curl验证私服库上有什么镜像**
+
+```
+curl -XGET http://192.168.136.148:5000/v2/_catalog
+```
+
+```
+{"repositories":[]}
+```
+
+可以看到，目前私服库没有任何镜像上传过
+
+**5.将新镜像zzyyubuntu:1.2修改符合私服规范的Tag**
+
+```
+按照公式： docker   tag   镜像:Tag   Host:Port/Repository:Tag
+```
+
+自己host主机IP地址，填写你们自己的，不要粘贴错误
+**使用命令 docker tag 将zubuntu:1.2 这个镜像修改为192.168.111.162:5000/zubuntu:1.2**
+
+```
+docker tag  zubuntu:1.2  192.168.136.148:5000/zzyyubuntu:1.2
+```
+
+
+**6.修改配置文件使之支持http**
+
+别无脑照着复制，registry-mirrors 配置的是国内阿里提供的镜像加速地址，不用加速的话访问官网的会很慢。
+2个配置中间有个逗号 ','别漏了，这个配置是json格式的。
+2个配置中间有个逗号 ','别漏了，这个配置是json格式的。
+2个配置中间有个逗号 ','别漏了，这个配置是json格式的。
+
+```
+vim命令新增如下红色内容：vim /etc/docker/daemon.json
+{
+“registry-mirrors”: [“https://docker.mirrors.ustc.edu.cn/”],
+“insecure-registries”: [“192.168.136.148:5000”]
+}…
+```
+
+修改完后，建议重启docker
+
+**7.push推送到私服库**
+
+```
+docker push 192.168.136.148:5000/zubuntu:1.2
+```
+
+**8.curl验证私服库上有什么镜像**
+
+```
+curl -XGET http://192.168.136.148:5000/v2/_catalog
+```
+
+
+**9.pull到本地并运行**
+
+```
+docker pull 192.168.111.162:5000/zzyyubuntu:1.2
+
+docker run -it 镜像ID /bin/bash
+```
+
+
+
+## Docker 容器数据卷
+
+> **坑：容器卷记得加入：–privileged=true**
+>
+> Docker挂载主机目录访问如果出现cannot open directory .: Permission denied
+> 解决办法：在挂载目录后多加一个–privileged=true参数即可
+>
+> 如果是CentOS7安全模块会比之前系统版本加强，不安全的会先禁止，所以目录挂载的情况被默认为不安全的行为，
+> 在SELinux里面挂载目录被禁止掉了额，如果要开启，我们一般使用–privileged=true命令，扩大容器的权限解决挂载目录没有权限的问题，也即
+> **使用该参数，container内的root拥有真正的root权限，否则，container内的root只是外部的一个普通用户权限。**
+
+
+
+### 1：概念：
+
+容器数据卷是一种特殊的目录或文件，它们存在于宿主机上，但可以被 Docker 容器挂载和访问。与容器的其他部分不同，数据卷不受联合文件系统的管理，这使得
+
+它们可以提供持久化存储和共享数据的特性。
+
+简单来说，容器数据卷就像是宿主机上的一个文件夹，但是可以被容器访问和使用。它的功能主要有两个方面：
+
+1. **持久化存储**：容器数据卷的设计目的就是为了数据的持久化。即使容器被删除或重新启动，数据卷上的数据仍然会保留在宿主机上。这样可以确保重要数据不会因为容器的生命周期而丢失。
+2. **数据共享**：容器数据卷也可以用于在多个容器之间共享数据。多个容器可以挂载同一个数据卷，从而实现它们之间的数据共享，这在一些场景下非常有用，比如多个容器需要访问相同的配置文件或者日志目录。
+
+举个例子来说明，假设你有一个 Web 应用，它运行在 Docker 容器中。你希望在容器内外都能够访问到应用生成的日志文件，同时希望这些日志文件不会因为容器的重启而丢失。这时，你可以使用容器数据卷来实现这个需求。你可以创建一个数据卷，并将它挂载到容器内的日志目录。这样，应用生成的日志文件就会保存在数据卷上，即使容器被删除或重新启动，日志文件仍然会被保留在宿主机上，从而确保了日志数据的持久化存储。同时，如果你有多个运行同样应用的容器，它们也可以挂载同一个数据卷，从而实现日志数据的共享，方便你对整个系统的监控和管理。
+
+总之，容器数据卷提供了一种方便且持久的方式来管理容器内的数据，同时也为容器之间的数据共享提供了便利。
+
+```
+总结：
+容器数据卷就是：宿主机上的一个文件夹/目录，可以被容器访问与挂载。数据卷不受unionFS的管理。
+
+容器数据卷的功能是什么：
+1：可以实现数据的共享，多个docker容器可以挂载与访问同一个容器数据卷。
+2：可以实现容器数据的持久化，容器中的数据保存在容器数据卷中，而容器数据卷又保存在宿主机上，当容器删除时，可以通过宿主机的容器数据卷恢复数据。
+```
+
+
+
+```
+ docker run -it --privileged=true -v /宿主机绝对路径目录:/容器内目录      镜像名
+```
+
+<img src="D:/%E4%BD%A0%E5%A5%BDJava/image-20240508180345536.png" alt="image-20240508180345536" style="zoom:50%;" />
+
+### 2：特点：
+
+1. **数据共享和重用**：数据卷可以在多个容器之间共享和重用数据。这意味着多个容器可以访问同一个数据卷，使得它们之间能够共享数据。
+2. **实时生效**：对数据卷中的更改会立即生效，而不需要重新构建镜像或重新启动容器。这意味着你可以在运行的容器中修改数据，而这些修改会立即反映在其他容器中，非常方便。
+3. **不包含在镜像更新中**：数据卷中的更改不会影响镜像的更新。这意味着当你更新镜像时，数据卷中的数据不会被修改或覆盖，保证了数据的完整性和持久性。
+4. **持续生命周期**：数据卷的生命周期会一直持续到没有容器使用它为止。即使容器被删除，数据卷中的数据仍然会存在，直到你主动删除或停止使用这个数据卷。
+
+
+
+举个例子来说明，假设你正在使用 Docker 运行一个基于数据库的应用，比如一个 WordPress 网站。你希望数据库中的数据能够被持久化保存，以防止容器被删除时数据丢失。这时，你可以创建一个数据卷，并将其挂载到数据库容器中的存储目录。这样，无论数据库容器如何变化，数据都会保存在数据卷中，确保了数据的持久性和安全性。同时，如果你需要扩展应用，可以轻松地创建新的容器并挂载同一个数据卷，实现数据的共享和重用，非常方便。
+
+### 3：案例：
+
+宿主vs容器之间映射添加容器卷
+直接命令添加：(将docker容器内的数据保存进宿主机的磁盘中)
+
+```
+docker run -it --privileged=true -v /宿主机绝对路径目录:/容器内目录      镜像名
+```
+
+ 例如：
+
+```
+sudo docker run -it --privileged=true -v /temp/host_data:/temp/docker_data ubuntu:20.04
+```
+
+宿主机下假如没这个目录，会自己帮你创建
+
+查看数据卷是否挂载成功：
+
+```
+docker inspect 容器ID
+```
+
+```
+"Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/temp/host_data",
+                "Destination": "/temp/docker_data",
+                "Mode": "",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ],
+```
+
+容器和宿主机之间数据共享：
+
+**1 docker修改，主机同步获得**
+**2 主机修改，docker同步获得**
+**3 docker容器stop，主机修改，docker容器重启后依旧可以同步**
+
+```shell
+[terrychen@terrychen /]$ cd /temp/host_data
+[terrychen@terrychen host_data]$ ls
+a.txt
+[terrychen@terrychen host_data]$ sudo touch b.txt
+[terrychen@terrychen host_data]$ ls
+a.txt  b.txt
+[terrychen@terrychen host_data]$ sudo docker exec -it 8297bde0e38c /bin/bash
+root@8297bde0e38c:/# cd /temp/docker_data
+root@8297bde0e38c:/temp/docker_data# ls
+a.txt  b.txt
+
+[terrychen@terrychen /]$ sudo docker run -d --privileged=true -v /temp/host_data:/temp/redis_data redis:6.2
+edd0dfb4b81bbb21a4eff5d93f151a94aca795b21f80d7fe898318fe9f4e8db7
+[terrychen@terrychen /]$ sudo docker ps
+]CONTAINER ID   IMAGE          COMMAND                   CREATED          STATUS          PORTS      NAMES
+edd0dfb4b81b   redis:6.2      "docker-entrypoint.s…"   22 seconds ago   Up 21 seconds   6379/tcp   amazing_heisenberg
+8297bde0e38c   ubuntu:20.04   "/bin/bash"               2 hours ago      Up 2 hours                 charming_diffie
+[terrychen@terrychen /]$ sudo docker exec -it edd0dfb4b81b /bin/bash
+root@edd0dfb4b81b:/data# cd /temp/redis_data
+root@edd0dfb4b81b:/temp/redis_data# ls
+a.txt  b.txt
+```
+
+
+
+
+
+
+
+### 4：读写规则映射添加说明
+
+**读写(默认) rw = read + write ：**
+
+```
+docker run -it --privileged=true -v /宿主机绝对路径目录:/容器内目录:rw      镜像名
+```
+
+
+**只读 ：容器实例内部被限制，只能读取不能写 ro = read only ：**
+
+**此时如果宿主机写入内容，可以同步给容器内，容器可以读取到。**
+
+ 
+
+```
+docker run -it --privileged=true -v /宿主机绝对路径目录:/容器内目录:ro      镜像名
+```
+
+
+
+### 5：卷的继承和共享
+
+容器1完成和宿主机的映射
+
+```
+docker run -it  --privileged=true -v /mydocker/u:/tmp --name u1 ubuntu
+```
+
+
+容器2继承容器1的卷规则
+
+```
+docker run -it  --privileged=true --volumes-from 父类  --name u2 ubuntu
+```
+
+```
+例如： docker run -it  --privileged=true --volumes-from u1  --name u2 ubuntu
+```
+
+
+
+继承的爹没了跟儿子没关系
+
+```
+总结：
+继承后，两个容器是并列的，指向同一个数据卷，一个改动数据卷，另一个也相应的改动
+```
+
+## Docker常规安装简介
+
+<img src="https://img-blog.csdnimg.cn/d072239a864d42de8616fe3a08b7228f.png" alt="在这里插入图片描述" style="zoom:50%;" />
+
+以后做团队项目，只用去下载仓库或者官网打包好的镜像，直接运行镜像即可使用。步骤也就直接统一了
+
+### 1：总体步骤：
+
+**搜索镜像**
+**拉取镜像**
+**查看镜像**
+**启动镜像 ：服务端口映射**
+**停止容器**
+**移除容器**
+
+常见模拟案例：
+
+### 2：安装tomcat
+
+**1.docker hub上面查找tomcat镜像**
+
+```
+docker search tomcat
+```
+
+
+**2.从docker hub上拉取tomcat镜像到本地**
+
+```
+docker pull tomcat
+```
+
+
+**3.docker images查看是否有拉取到的tomcat**
+
+**4.使用tomcat镜像创建容器实例(也叫运行镜像)**
+
+```
+docker run -it -p 8080:8080 tomcat
+-p 小写，主机端口:docker容器端口
+-P 大写，随机分配端口
+i:交互
+t:终端
+d:后台
+5.访问猫首页
+```
+
+出现问题：出现404，访问不到
+
+解决：
+
+1.可能没有映射端口或者没有关闭防火墙
+
+ 2.先把webapps文件删了，再把webapps.dist目录换成webapps。因为真正有东西的在webapps.dist里面，所以把它进行改名
+
+先把webapps文件删了：  rm -f webapps
+把webapps.dist目录换成webapps 
+
+```
+ mv webapps.dist webapps
+```
+
+这样子运行最新版都要修改，太麻烦了。可以使用免修版：
+
+免修改版说明：
+
+```
+docker pull billygoo/tomcat8-jdk8
+```
+
+```
+docker run -d -p 8080:8080 --name mytomcat8 billygoo/tomcat8-jdk8
+```
+
+
+
+### 3：安装mysql
+
+**1.docker hub上面查找mysql镜像**
+
+**2.从docker hub上(阿里云加速器)拉取mysql镜像到本地标签为5.7**
+
+**3.使用mysql5.7镜像创建容器(也叫运行镜像)**
+
+#### 简单版：
+
+使用mysql镜像
+
+```
+docker run -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123456 -d mysql:5.7
+```
+
+```
+docker ps
+```
+
+```
+docker exec -it 容器ID /bin/bash
+```
+
+```
+mysql -uroot -p
+尝试建库建表插入数据：
+```
+
+```
+show databases;
+create database db01;
+create table t1(id int,name varchar(20));
+insert into t1 values(1,'z3');
+select * from t1;
+```
+
+去使用本地的navicat看看能不能连接运行在dokcer上的mysql容器实例服务，发现是可以的，且刚刚新建的表和数据都存在。在navicat中插入数据发现也是互通的。
+
+**坑：但是插入中文数据时，出现了报错：**
+
+**说明docker上默认字符集编码隐患 ，于是乎在docker里面的mysql容器实例查看，输入命令内容如下：**
+
+```
+ SHOW VARIABLES LIKE 'character%'
+```
+
+
+发现全是拉丁，这种得在docker的mysql实例修改！
+
+且一不小心删除容器后，那里面的mysql数据如何办？
+
+看下面的实战版↓：
+
+#### 实战版（解决乱码和备份问题)：
+
+1**.新建mysql容器实例**
+
+```
+docker run -d -p 3306:3306 --privileged=true 
+-v /zzyyuse/mysql/log:/var/log/mysql 
+-v /zzyyuse/mysql/data:/var/lib/mysql 
+-v /zzyyuse/mysql/conf:/etc/mysql/conf.d 
+-e MYSQL_ROOT_PASSWORD=123456  
+--name mysql 
+mysql:5.7
+```
+
+2. **解决中文乱码问题：新建my.cnf 通过容器卷同步给mysql容器实例**
+
+
+
+```
+cd /zzyyuse/mysql/conf/
+vim my.cnf
+cat my.cnf
+```
+
+```
+[client]
+default_character_set=utf8
+[mysqld]
+collation_server = utf8_general_ci
+character_set_server = utf8
+```
+
+
+**3.重新启动mysql容器实例再重新进入并查看字符编码**
+
+**4.再新建库新建表再插入中文测试**
+
+**5.结论：**
+
+之前的DB 无效
+
+修改字符集操作+重启mysql容器实例
+
+之后的DB 有效，需要新建
+
+结论：docker安装完MySQL并run出容器后，建议请先修改完字符集编码后再新建mysql库-表-插数据
+
+**6.假如将当前容器实例删除，再重新来一次，之前建的db01实例还有，里面的数据也没有丢失**
+
+```
+docker run -d -p 3306:3306 --privileged=true 
+-v /zzyyuse/mysql/log:/var/log/mysql 
+-v /zzyyuse/mysql/data:/var/lib/mysql 
+-v /zzyyuse/mysql/conf:/etc/mysql/conf.d 
+-e MYSQL_ROOT_PASSWORD=123456  
+--name mysql 
+mysql:5.7
+```
+
+
+以后，务必要注意解决乱码和备份问题！
+
+### 4：安装redis
+
+**1.从docker hub上(阿里云加速器)拉取redis镜像到本地标签为6.0.8**
+
+2.命令提醒：容器卷记得加入–privileged=true
+
+Docker挂载主机目录Docker访问出现cannot open directory .: Permission denied
+解决办法：在挂载目录后多加一个--privileged=true参数即可
+
+**3.在CentOS宿主机下新建目录/app/redis**
+
+```
+mkdir -p /app/redis
+```
+
+
+**4.将一个redis.conf文件模板拷贝进/app/redis目录下**
+
+ 4.1拷贝配置文件：
+ 将准备好的redis.conf文件放进/app/redis目录下
+
+这个看之前的Linux安装redis的详细教程：
+
+**5./app/redis目录下修改redis.conf文件**
+![在这里插入图片描述](https://img-blog.csdnimg.cn/66b761e4bfc34e59bf2690ff713b9e9e.png)
+
+ 3.4开启redis数据持久化 appendonly yes 可选
+
+**6.使用redis6.0.8镜像创建容器(也叫运行镜像)**
+
+**7.测试redis-cli连接上来**
+
+8.请证明docker启动使用了我们自己指定的配置文件
+
+修改前：我们用的配置文件，数据库默认是16个
+修改后：宿主机的修改会同步给docker容器里面的配置。 记得重启服务
+9.测试redis-cli连接上来第2次
+
+
 
 
 
