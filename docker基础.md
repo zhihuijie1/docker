@@ -1010,5 +1010,45 @@ mkdir -p /app/redis
 
 
 
+## 1.Docker复杂安装
+
+### 1.1安装mysql主从复制搭建步骤
+
+1.新建主服务器容器实例3307
+
+```
+docker run -p 3307:3306 --name mysql-master \
+-v /mydata/mysql-master/log:/var/log/mysql \
+-v /mydata/mysql-master/data:/var/lib/mysql \
+-v /mydata/mysql-master/conf:/etc/mysql \
+-e MYSQL_ROOT_PASSWORD=root 
+-d mysql:5.7
+
+
+docker ps
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
